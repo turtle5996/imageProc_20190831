@@ -1,0 +1,405 @@
+﻿
+// imageProc_20190831View.cpp: CimageProc20190831View 클래스의 구현
+//
+
+#include "pch.h"
+#include "framework.h"
+// SHARED_HANDLERS는 미리 보기, 축소판 그림 및 검색 필터 처리기를 구현하는 ATL 프로젝트에서 정의할 수 있으며
+// 해당 프로젝트와 문서 코드를 공유하도록 해 줍니다.
+#ifndef SHARED_HANDLERS
+#include "imageProc_20190831.h"
+#endif
+
+#include "imageProc_20190831Doc.h"
+#include "imageProc_20190831View.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#endif
+
+
+// CimageProc20190831View
+
+IMPLEMENT_DYNCREATE(CimageProc20190831View, CScrollView)
+
+BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
+	// 표준 인쇄 명령입니다.
+	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CScrollView::OnFilePrintPreview)
+	
+//	ON_COMMAND(ID_TESTBOX, &CimageProc20190831View::OnTESTBOX)
+    ON_COMMAND(ID_PIXEL_ADD, &CimageProc20190831View::OnPixelAdd)
+	ON_COMMAND(ID_PIXEL_SUB, &CimageProc20190831View::OnPixelSub)
+	ON_COMMAND(ID_PIXEL_MUL, &CimageProc20190831View::OnPixelMul)
+	ON_COMMAND(ID_PIXEL_DIV, &CimageProc20190831View::OnPixelDiv)
+	ON_COMMAND(ID_PIXEL_HISTO_EQ, &CimageProc20190831View::OnPixelHistoEq)
+	ON_COMMAND(ID_PIXEL_STRETCH, &CimageProc20190831View::OnPixelStretch)
+	ON_COMMAND(ID_PIXEL_BINARYZATION, &CimageProc20190831View::OnPixelBinaryzation)
+	ON_COMMAND(ID_PIXEL_TWO_IMAGE_ADD, &CimageProc20190831View::OnPixelTwoImageAdd)
+	ON_COMMAND(ID_PIXEL_TWO_IMAGE_SUB, &CimageProc20190831View::OnPixelTwoImageSub)
+	ON_COMMAND(ID_REGION_SHARPENING, &CimageProc20190831View::OnRegionSharpening)
+	ON_COMMAND(ID_REGION_SMOOTHING, &CimageProc20190831View::OnRegionSmoothing)
+	ON_COMMAND(ID_REGION_EMBOSSING, &CimageProc20190831View::OnRegionEmbossing)
+	ON_COMMAND(ID_REGION_SOBEL, &CimageProc20190831View::OnRegionSobel)
+	ON_COMMAND(ID_REGION_PREWITT, &CimageProc20190831View::OnRegionPrewitt)
+	ON_COMMAND(ID_REGION_ROBERTS, &CimageProc20190831View::OnRegionRoberts)
+	ON_COMMAND(ID_REGION_AVERAGE_FILTER, &CimageProc20190831View::OnRegionAverageFilter)
+	ON_COMMAND(ID_REGION_MEDIAN, &CimageProc20190831View::OnRegionMedian)
+	ON_COMMAND(ID_MOPOLOGY_COLOR_TO_GRAY, &CimageProc20190831View::OnMopologyColorGray)
+	ON_COMMAND(ID_MOPOLOGY_BINARY, &CimageProc20190831View::OnMopologyBinary)
+	ON_COMMAND(ID_EROSION, &CimageProc20190831View::OnErosion)
+	ON_COMMAND(ID_DILATION, &CimageProc20190831View::OnDilation)
+END_MESSAGE_MAP()
+
+// CimageProc20190831View 생성/소멸
+
+CimageProc20190831View::CimageProc20190831View() noexcept
+{
+	// TODO: 여기에 생성 코드를 추가합니다.
+
+}
+
+CimageProc20190831View::~CimageProc20190831View()
+{
+}
+
+BOOL CimageProc20190831View::PreCreateWindow(CREATESTRUCT& cs)
+{
+	// TODO: CREATESTRUCT cs를 수정하여 여기에서
+	//  Window 클래스 또는 스타일을 수정합니다.
+
+	return CScrollView::PreCreateWindow(cs);
+}
+
+// CimageProc20190831View 그리기
+
+void CimageProc20190831View::OnDraw(CDC* pDC)
+{
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	if (pDoc->inputImage != NULL) {
+		if (pDoc->depth == 1) {
+			for (int y = 0; y < pDoc->imageHeight; y++) {
+				for (int x = 0; x < pDoc->imageWidth; x++) {
+					pDC->SetPixel(x, y, RGB(pDoc->inputImage[y][x],
+						pDoc->inputImage[y][x], pDoc->inputImage[y][x]));
+				}
+			}
+		}
+		else
+			for (int y = 0; y < pDoc->imageHeight; y++)
+				for (int x = 0; x < pDoc->imageWidth; x++)
+					pDC->SetPixel(x, y, RGB(pDoc->inputImage[y][3 * x + 0],
+						pDoc->inputImage[y][3 * x + 1], pDoc->inputImage[y][3 * x + 2]));
+			
+	}
+	if (pDoc->resultImage != NULL) {
+		if (pDoc->depth == 1) {
+			for (int y = 0; y < pDoc->imageHeight; y++) {
+				for (int x = 0; x < pDoc->imageWidth; x++) {
+					pDC->SetPixel(x+400 , y, RGB(pDoc->resultImage[y][x], pDoc->resultImage[y][x],
+						pDoc->resultImage[y][x]));
+				}
+			}
+		}
+		else
+			for(int y = 0; y < pDoc->imageHeight; y++)
+			  for (int x = 0; x < pDoc->imageWidth; x++)
+				pDC->SetPixel(x+400, y, RGB(pDoc->resultImage[y][3 * x + 0],
+					pDoc->resultImage[y][3 * x + 1], pDoc->resultImage[y][3 * x + 2]));
+	}
+	if (pDoc->inputImage2 != NULL) {
+		if (pDoc->depth == 1) {
+			for (int y = 0; y < pDoc->imageHeight; y++) {
+				for (int x = 0; x < pDoc->imageWidth; x++) {
+					pDC->SetPixel(x +800, y, RGB(pDoc->inputImage2[y][x], pDoc->inputImage2[y][x],
+						pDoc->inputImage2[y][x]));
+				}
+			}
+		}
+		else
+			for (int y = 0; y < pDoc->imageHeight; y++)
+				for (int x = 0; x < pDoc->imageWidth; x++)
+					pDC->SetPixel(x +800, y, RGB(pDoc->inputImage2[y][3 * x + 0],
+						pDoc->inputImage2[y][3 * x + 1], pDoc->inputImage2[y][3 * x + 2]));
+	}
+	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
+}
+
+void CimageProc20190831View::OnInitialUpdate()
+{
+	CScrollView::OnInitialUpdate();
+
+	CSize sizeTotal;
+	// TODO: 이 뷰의 전체 크기를 계산합니다.
+	sizeTotal.cx = sizeTotal.cy = 2048;
+	SetScrollSizes(MM_TEXT, sizeTotal);
+}
+
+
+// CimageProc20190831View 인쇄
+
+BOOL CimageProc20190831View::OnPreparePrinting(CPrintInfo* pInfo)
+{
+	// 기본적인 준비
+	return DoPreparePrinting(pInfo);
+}
+
+void CimageProc20190831View::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
+{
+	// TODO: 인쇄하기 전에 추가 초기화 작업을 추가합니다.
+}
+
+void CimageProc20190831View::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
+{
+	// TODO: 인쇄 후 정리 작업을 추가합니다.
+}
+
+
+// CimageProc20190831View 진단
+
+#ifdef _DEBUG
+void CimageProc20190831View::AssertValid() const
+{
+	CScrollView::AssertValid();
+}
+
+void CimageProc20190831View::Dump(CDumpContext& dc) const
+{
+	CScrollView::Dump(dc);
+}
+
+CimageProc20190831Doc* CimageProc20190831View::GetDocument() const // 디버그되지 않은 버전은 인라인으로 지정됩니다.
+{
+	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CimageProc20190831Doc)));
+	return (CimageProc20190831Doc*)m_pDocument;
+}
+#endif //_DEBUG
+
+
+// CimageProc20190831View 메시지 처리기
+
+
+
+//더하기
+void CimageProc20190831View::OnPixelAdd()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc= GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL) return;
+	pDoc->pixelAdd();
+	
+	Invalidate(false);
+}
+
+//빼기
+void CimageProc20190831View::OnPixelSub()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL) return;
+	pDoc->pixelSub();
+
+	Invalidate(false);
+}
+
+//곱하기
+void CimageProc20190831View::OnPixelMul()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL) return;
+	pDoc->pixelMul();
+
+	Invalidate(false);
+}
+
+// 나누기
+void CimageProc20190831View::OnPixelDiv()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL) return;
+	pDoc->pixelDiv();
+	Invalidate(false);
+}
+
+//히스토그램 평활화
+void CimageProc20190831View::OnPixelHistoEq()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->pixelHistoEq();
+	Invalidate(false);
+
+}
+
+//명암대비 스트레칭
+void CimageProc20190831View::OnPixelStretch()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->pixelStretch();
+	Invalidate(false);
+}
+
+//이진화
+void CimageProc20190831View::OnPixelBinaryzation()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->pixelBinaryzation();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnPixelTwoImageAdd()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->pixelTwoImageAdd();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnPixelTwoImageSub()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->pixelTwoImageSub();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionSharpening()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionSharpening();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionSmoothing()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionSmoothing();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionEmbossing()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionEmbossing();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionSobel()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionSobel();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionPrewitt()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionPrewitt();
+	Invalidate(false);
+}
+
+
+
+void CimageProc20190831View::OnRegionRoberts()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionRoberts();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionAverageFilter()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionAverageFilter();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnRegionMedian()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->RegionMedian();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnMopologyColorGray()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->MopologyColorGray();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnMopologyBinary()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	pDoc->MopologyBinary();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnErosion()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->Erosion();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnDilation()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->Dilation();
+	Invalidate(false);
+}
