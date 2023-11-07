@@ -1072,7 +1072,7 @@ void CimageProc20190831Doc::GeometryZoominPixelCopy()
 	//역방향 사사상
 	for (int y = 0; y < gImageHeight; y++)
 		for (int x = 0; x < gImageWidth; x++) {
-			if (depth = 1) {
+			if (depth == 1) {
 				gResultImg[y][x] = inputImage[y / yscale][x / xscale];
 			}
 			else 
@@ -1136,9 +1136,24 @@ void CimageProc20190831Doc::GeometryZoominInterpolation()
 			if (Cy > imageHeight - 1) Cy = imageHeight - 1;
 			if (Dy > imageHeight - 1) Dy = imageHeight - 1;
 
-			E = (1 - alpha) * inputImage[Ay][Ax] + alpha * inputImage[By][Bx];
-			F = (1 - alpha) * inputImage[Cy][Cx] + alpha * inputImage[Dy][Dx];
+			if (depth == 1) {
+				E = (1 - alpha) * inputImage[Ay][Ax] + alpha * inputImage[By][Bx];
+				F = (1 - alpha) * inputImage[Cy][Cx] + alpha * inputImage[Dy][Dx];
 
-			gResultImg[y][x] = (unsigned char)(E * (1 - beta) + F * beta);
+				gResultImg[y][x] = (unsigned char)(E * (1 - beta) + F * beta);
+			}
+			else {
+				E = (1 - alpha) * inputImage[Ay][3*Ax+0] + alpha * inputImage[By][3*Bx+0];
+				F = (1 - alpha) * inputImage[Cy][3*Cx+0] + alpha * inputImage[Dy][3*Dx+0];
+				gResultImg[y][3*x+0] = (unsigned char)(E * (1 - beta) + F * beta);
+
+				E = (1 - alpha) * inputImage[Ay][3 * Ax + 1] + alpha * inputImage[By][3 * Bx + 1];
+				F = (1 - alpha) * inputImage[Cy][3 * Cx + 1] + alpha * inputImage[Dy][3 * Dx + 1];
+				gResultImg[y][3 * x + 1] = (unsigned char)(E * (1 - beta) + F * beta);
+
+				E = (1 - alpha) * inputImage[Ay][3 * Ax + 2] + alpha * inputImage[By][3 * Bx + 2];
+				F = (1 - alpha) * inputImage[Cy][3 * Cx + 2] + alpha * inputImage[Dy][3 * Dx + 2];
+				gResultImg[y][3 * x + 2] = (unsigned char)(E * (1 - beta) + F * beta);
+			}
 		}
 }
