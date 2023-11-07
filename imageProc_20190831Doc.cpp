@@ -1105,8 +1105,8 @@ void CimageProc20190831Doc::GeometryZoominInterpolation()
 		free(gResultImg);
 	}
 
-	gImageWidth = imageWidth * xscale+0.5;
-	gImageHeight = imageHeight * yscale+0.5;
+	gImageWidth = imageWidth * xscale;
+	gImageHeight = imageHeight * yscale;
 
 	//메모리할당
 	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
