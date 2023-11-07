@@ -46,13 +46,19 @@ protected:
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
 public:
+	//입력이미지
 	unsigned char** inputImage;
 	unsigned char** inputImage2; 
+	//출력이미지
 	unsigned char**  resultImage;
 	
 	int imageWidth;
 	int imageHeight;
 	int depth; // 값 1=흑백, 3= 컬러
+	int gImageWidth;
+	int gImageHeight;
+	unsigned char** gResultImg;
+
 	void pixelAdd();
 	void pixelSub();
 	void pixelMul();
@@ -79,4 +85,9 @@ public:
 	void MopologyBinary();
 	void Erosion();
 	void Dilation();
+	void Opening();
+	void CopyResultToInput();
+	void Closing();
+	void GeometryZoominPixelCopy();
+	void GeometryZoominInterpolation();
 };

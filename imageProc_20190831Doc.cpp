@@ -35,6 +35,7 @@ CimageProc20190831Doc::CimageProc20190831Doc() noexcept
 	inputImage = NULL;
 	inputImage2 = NULL;
 	resultImage = NULL;
+	gResultImg = NULL;
 
 }
 
@@ -56,7 +57,11 @@ CimageProc20190831Doc::~CimageProc20190831Doc()
 			free(resultImage[i]);
 		free(resultImage);
 	}
-
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
 }
 
 BOOL CimageProc20190831Doc::OnNewDocument()
@@ -963,4 +968,177 @@ void CimageProc20190831Doc::Dilation()
 			}
 		}
 	}
+}
+
+
+void CimageProc20190831Doc::Opening()
+{
+	// TODO: 여기에 구현 코드 추가.
+	Erosion();
+
+	CopyResultToInput();
+	Erosion();
+
+	CopyResultToInput();
+	Erosion();
+
+	CopyResultToInput();
+	Dilation();
+
+	CopyResultToInput();
+	Dilation();
+
+	CopyResultToInput();
+	Dilation();
+
+
+}
+
+
+void CimageProc20190831Doc::CopyResultToInput()
+{
+	// TODO: 여기에 구현 코드 추가.
+	int x, y;
+	for (y = 0; y < imageHeight; y++) {
+		for (x = 0; x < imageWidth*depth; x++) {
+			inputImage[y][x] = resultImage[y][x];
+		}
+	}
+}
+
+
+void CimageProc20190831Doc::Closing()
+{
+	// TODO: 여기에 구현 코드 추가.
+	Dilation();
+
+	CopyResultToInput();
+	Dilation();
+
+	CopyResultToInput();
+	Dilation();
+
+	CopyResultToInput();
+	Erosion();
+
+	CopyResultToInput();
+	Erosion();
+
+	CopyResultToInput();
+	Erosion();
+
+}
+
+
+void CimageProc20190831Doc::GeometryZoominPixelCopy()
+{
+	// TODO: 여기에 구현 코드 추가.
+	int xscale = 3;
+	int yscale = 3;
+	int i;
+
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
+	gImageWidth = imageWidth * xscale;
+	gImageHeight = imageHeight * yscale;
+	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
+
+	for (i = 0; i < gImageHeight; i++) {
+		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
+	}
+	//전방향사상
+	/* 
+	for (int y = 0; y < imageHeight; y++) {
+		for (int x = 0; x < imageWidth; x++) {
+			for (int j = 0; j < yscale; j++) {
+				for (i = 0; i < xscale; i++) {
+					if (depth == 1) {
+						gResultImg[yscale * y + j][xscale * x + i] = inputImage[y][x];
+					}
+					else {
+						gResultImg[yscale * y + j][(xscale * x + i) * 3 + 0] = inputImage[y][x * 3 + 0];
+						gResultImg[yscale * y + j][(xscale * x + i) * 3 + 1] = inputImage[y][x * 3 + 1];
+						gResultImg[yscale * y + j][(xscale * x + i) * 3 + 2] = inputImage[y][x * 3 + 2];
+					}
+				}
+			}
+		}
+	}
+	*/
+	//역방향 사사상
+	for (int y = 0; y < gImageHeight; y++)
+		for (int x = 0; x < gImageWidth; x++) {
+			if (depth = 1) {
+				gResultImg[y][x] = inputImage[y / yscale][x / xscale];
+			}
+			else 
+			{
+				gResultImg[y][3*x+0] = inputImage[y / yscale][3*(x / xscale)+0];
+				gResultImg[y][3 * x + 1] = inputImage[y / yscale][3*(x / xscale)+1];
+				gResultImg[y][3 * x + 2] = inputImage[y / yscale][3*(x / xscale)+2];
+			}
+		}
+		
+
+}
+
+
+void CimageProc20190831Doc::GeometryZoominInterpolation()
+{
+	// TODO: 여기에 구현 코드 추가.
+	int i;
+
+	float xscale =2.1;
+	float yscale =1.5;
+	float src_x,src_y ;
+	float alpha,beta;
+	int Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
+	int E, F;
+
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
+	gImageWidth = imageWidth * xscale+0.5;
+	gImageHeight = imageHeight * yscale+0.5;
+
+	//메모리할당
+	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
+	for (i = 0; i < gImageHeight; i++) {
+		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
+	}
+
+	for (int y = 0; y < gImageHeight; y++)
+		for (int x = 0; x < gImageWidth; x++) {
+			src_x = x / xscale;
+			src_y = y / yscale;
+
+			alpha = src_x - (int)src_x;
+			beta = src_y - (int)src_y;
+
+			Ax = (int)src_x;
+			Ay = (int)src_y;
+			Bx = Ax + 1;
+			By = Ay;
+			Cx = Ax;
+			Cy = Ay+1;
+			Dx = Ax+1;
+			Dy = Ay+1;
+
+			if (Bx > imageWidth - 1) Bx = imageWidth - 1;
+			if (Dx > imageWidth - 1) Dx = imageWidth - 1;
+			if (Cy > imageHeight - 1) Cy = imageHeight - 1;
+			if (Dy > imageHeight - 1) Dy = imageHeight - 1;
+
+			E = (1 - alpha) * inputImage[Ay][Ax] + alpha * inputImage[By][Bx];
+			F = (1 - alpha) * inputImage[Cy][Cx] + alpha * inputImage[Dy][Dx];
+
+			gResultImg[y][x] = (unsigned char)(E * (1 - beta) + F * beta);
+		}
 }

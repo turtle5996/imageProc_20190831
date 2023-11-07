@@ -68,6 +68,10 @@ public:
 	afx_msg void OnMopologyBinary();
 	afx_msg void OnErosion();
 	afx_msg void OnDilation();
+	afx_msg void OnOpening();
+	afx_msg void OnClosing();
+	afx_msg void OnGeometryZoominPixelCopy();
+	afx_msg void OnGeometryZoominInterpolation();
 };
 
 #ifndef _DEBUG  // imageProc_20190831View.cpp의 디버그 버전

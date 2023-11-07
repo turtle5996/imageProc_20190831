@@ -50,6 +50,10 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 	ON_COMMAND(ID_MOPOLOGY_BINARY, &CimageProc20190831View::OnMopologyBinary)
 	ON_COMMAND(ID_EROSION, &CimageProc20190831View::OnErosion)
 	ON_COMMAND(ID_DILATION, &CimageProc20190831View::OnDilation)
+	ON_COMMAND(ID_OPENING, &CimageProc20190831View::OnOpening)
+	ON_COMMAND(ID_CLOSING, &CimageProc20190831View::OnClosing)
+	ON_COMMAND(ID_GEOMETRY_ZOOMIN_PIXEL_COPY, &CimageProc20190831View::OnGeometryZoominPixelCopy)
+	ON_COMMAND(ID_GEOMETRY_ZOOMIN_INTERPOLATION, &CimageProc20190831View::OnGeometryZoominInterpolation)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -99,7 +103,7 @@ void CimageProc20190831View::OnDraw(CDC* pDC)
 		if (pDoc->depth == 1) {
 			for (int y = 0; y < pDoc->imageHeight; y++) {
 				for (int x = 0; x < pDoc->imageWidth; x++) {
-					pDC->SetPixel(x+400 , y, RGB(pDoc->resultImage[y][x], pDoc->resultImage[y][x],
+					pDC->SetPixel(x+100+pDoc->imageWidth , y, RGB(pDoc->resultImage[y][x], pDoc->resultImage[y][x],
 						pDoc->resultImage[y][x]));
 				}
 			}
@@ -107,23 +111,41 @@ void CimageProc20190831View::OnDraw(CDC* pDC)
 		else
 			for(int y = 0; y < pDoc->imageHeight; y++)
 			  for (int x = 0; x < pDoc->imageWidth; x++)
-				pDC->SetPixel(x+400, y, RGB(pDoc->resultImage[y][3 * x + 0],
+				pDC->SetPixel(x+100 + pDoc->imageWidth, y, RGB(pDoc->resultImage[y][3 * x + 0],
 					pDoc->resultImage[y][3 * x + 1], pDoc->resultImage[y][3 * x + 2]));
 	}
 	if (pDoc->inputImage2 != NULL) {
 		if (pDoc->depth == 1) {
 			for (int y = 0; y < pDoc->imageHeight; y++) {
 				for (int x = 0; x < pDoc->imageWidth; x++) {
-					pDC->SetPixel(x +800, y, RGB(pDoc->inputImage2[y][x], pDoc->inputImage2[y][x],
-						pDoc->inputImage2[y][x]));
+					pDC->SetPixel(x + 100 + pDoc->imageWidth+100 + pDoc->imageWidth, y, RGB(pDoc->inputImage2[y][x], 
+						pDoc->inputImage2[y][x],pDoc->inputImage2[y][x]));
 				}
 			}
 		}
 		else
 			for (int y = 0; y < pDoc->imageHeight; y++)
 				for (int x = 0; x < pDoc->imageWidth; x++)
-					pDC->SetPixel(x +800, y, RGB(pDoc->inputImage2[y][3 * x + 0],
+					pDC->SetPixel(x + 100 + pDoc->imageWidth + 100 + pDoc->imageWidth, y, RGB(pDoc->inputImage2[y][3 * x + 0],
 						pDoc->inputImage2[y][3 * x + 1], pDoc->inputImage2[y][3 * x + 2]));
+	}
+
+	if (pDoc->gResultImg != NULL) {
+		if (pDoc->depth == 1) {
+			for (int y = 0; y < pDoc->gImageHeight; y++) {
+				for (int x = 0; x < pDoc->gImageWidth; x++) {
+					pDC->SetPixel(x, y + pDoc->imageHeight + 20, RGB(pDoc->gResultImg[y][x], pDoc->gResultImg[y][x], pDoc->gResultImg[y][x]));
+				}
+			}
+		}
+		else {
+			for (int y = 0; y < pDoc->gImageHeight; y++) {
+				for (int x = 0; x < pDoc->gImageWidth; x++) {
+					pDC->SetPixel(x, y + pDoc->imageHeight + 20, RGB(pDoc->gResultImg[y][3*x+0], 
+						pDoc->gResultImg[y][3 * x + 1], pDoc->gResultImg[y][3 * x + 2]));
+				}
+			}
+		}
 	}
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 }
@@ -401,5 +423,49 @@ void CimageProc20190831View::OnDilation()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->Dilation();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnOpening()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->Opening();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnClosing()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->Closing();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryZoominPixelCopy()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryZoominPixelCopy();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryZoominInterpolation()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryZoominInterpolation();
 	Invalidate(false);
 }

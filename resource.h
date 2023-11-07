@@ -58,13 +58,21 @@
 #define ID_MOPOLOGY_BINARY              32819
 #define ID_EROSION                      32820
 #define ID_DILATION                     32821
+#define ID_OPEING                       32822
+#define ID_OPENING                      32823
+#define ID_32824                        32824
+#define ID_CLOSING                      32825
+#define ID_32826                        32826
+#define ID_GEOMETRY_ZOOMIN_PIXEL_COPY   32827
+#define ID_32828                        32828
+#define ID_GEOMETRY_ZOOMIN_INTERPOLATION 32829
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        310
-#define _APS_NEXT_COMMAND_VALUE         32822
+#define _APS_NEXT_COMMAND_VALUE         32830
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
