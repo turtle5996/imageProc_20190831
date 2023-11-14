@@ -18,6 +18,7 @@
 #define new DEBUG_NEW
 #endif
 #include <algorithm>
+#define PI 3.14159
 
 // CimageProc20190831Doc
 
@@ -1167,7 +1168,7 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 	int yscale = 2;
 	int src_x, src_y;
 
-	int i;
+	int i,y,x;
 
 	if (gResultImg != NULL) {
 		for (i = 0; i < gImageHeight; i++)
@@ -1184,8 +1185,8 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
 	}
 
-	for (int y = 0; y < gImageHeight; y++) {
-		for (int x = 0; x < gImageWidth; x++) {
+	for (y = 0; y < gImageHeight; y++) {
+		for (x = 0; x < gImageWidth; x++) {
 			if (depth == 1)
 				gResultImg[y][x] = inputImage[y * yscale][x * xscale];
 			else {
@@ -1207,6 +1208,9 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 	int src_x, src_y;
 	int  i,j;
 
+	gImageWidth = imageWidth / xscale + 1;
+	gImageHeight = imageHeight / yscale + 1;
+
 	if (gResultImg != NULL) {
 		for (i = 0; i < gImageHeight; i++)
 			free(gResultImg[i]);
@@ -1222,6 +1226,9 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 	for (int y = 0; y < imageHeight; y+=yscale) {
 		for (int x = 0; x < imageWidth; x+=xscale) {
 			sum = 0;
+			rsum = 0;
+			gsum = 0;
+			bsum = 0;
 			for (j = 0; j < yscale; j++) 
 				for (i = 0; i < xscale; i++) {
 					src_x = x + i;
@@ -1231,13 +1238,13 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 					if (depth == 1) 
 					    sum += inputImage[src_y][src_x];
 					else {
-						rsum += inputImage[src_y][3*src_x+0];
+						rsum += inputImage[src_y][3 * src_x + 0];
 						gsum += inputImage[src_y][3 * src_x + 1];
 						bsum += inputImage[src_y][3 * src_x + 2];
 					}
 				}
-			if(depth==1)
-			    gResultImg[y / yscale][x / xscale] = sum / (xscale * yscale);
+			if (depth == 1)
+				gResultImg[y / yscale][x / xscale] = sum / (xscale * yscale);
 			else {
 				gResultImg[y / yscale][3 * (x / xscale) + 0] = rsum / (xscale * yscale);
 				gResultImg[y / yscale][3 * (x / xscale) + 1] = gsum / (xscale * yscale);
@@ -1245,4 +1252,65 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 			}
 		}
 	}
+}
+
+
+void CimageProc20190831Doc::GeometryRotate()
+{
+	// TODO: 여기에 구현 코드 추가.
+	int x, y, i, j, xdiff, ydiff;
+	int angle = 120; //degree
+	float radian;
+	int Cx, Cy, Oy;
+	int x_source, y_source;
+
+
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
+	radian = 2 * PI / 360 * angle;
+	gImageWidth = (imageHeight * fabs(cos(PI / 2 - radian)) + imageWidth * fabs(cos(radian)));
+	gImageHeight = (imageHeight * fabs(cos(radian)) + imageWidth * fabs(cos(PI / 2 - radian)));
+
+	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
+	for (i = 0; i < gImageHeight; i++) {
+		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
+	}
+
+	// 중심점
+	Cx = imageWidth / 2;
+	Cy = imageHeight / 2;
+
+	//y의 마지막 좌표값
+	Oy = imageHeight - 1;
+	xdiff = (gImageWidth - imageWidth) / 2;
+	ydiff = (gImageHeight - imageHeight) / 2;
+
+	for (y = -ydiff; y < gImageHeight - ydiff; y++)
+		for (x = -xdiff; x < gImageWidth - xdiff; x++) {
+			x_source = (Oy - y - Cy) * sin(angle) +( x - Cx) * cos(angle) + Cx;
+			y_source = (Oy - y - Cy) * cos(angle) - (x - Cx) * sin(angle) + Cy;
+
+			y_source = Oy - y_source;
+			if (depth == 1) {
+				if (x_source<0 || x_source>imageWidth - 1 || y_source<0 || y_source>imageHeight - 1) gResultImg[y + ydiff][x + xdiff] = 255;
+				else gResultImg[y + ydiff][x + xdiff] = inputImage[y_source][x_source];
+			}
+			else {
+				if (x_source<0 || x_source>imageWidth - 1 || y_source<0 || y_source>imageHeight - 1) { 
+					gResultImg[y + ydiff][3 * (x + xdiff) + 0] = 255;
+					gResultImg[y + ydiff][3 * (x + xdiff) + 1] = 255;
+					gResultImg[y + ydiff][3 * (x + xdiff) + 2] = 255;
+				}
+				else {
+					gResultImg[y + ydiff][3 * (x + xdiff) + 0] = inputImage[y_source][3 * x_source + 0];
+					gResultImg[y + ydiff][3 * (x + xdiff) + 1] = inputImage[y_source][3 * x_source + 1];
+					gResultImg[y + ydiff][3 * (x + xdiff) + 2] = inputImage[y_source][3 * x_source + 2];
+				}
+			}
+		}
+
 }

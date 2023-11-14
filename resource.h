@@ -73,13 +73,15 @@
 #define ID_32834                        32834
 #define ID_GEOMETRY_ZOOMOUT_BLUER       32835
 #define ID_GEOMETRY_ZOOMOUT_MEANSUB     32836
+#define ID_32837                        32837
+#define ID_GEOMETRY_ROTATE              32838
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        310
-#define _APS_NEXT_COMMAND_VALUE         32837
+#define _APS_NEXT_COMMAND_VALUE         32839
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

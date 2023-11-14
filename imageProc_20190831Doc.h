@@ -92,4 +92,5 @@ public:
 	void GeometryZoominInterpolation();
 	void GeometryZoomoutSubsampling();
 	void GeometryZoomoutAvg();
+	void GeometryRotate();
 };
