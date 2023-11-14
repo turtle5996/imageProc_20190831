@@ -1166,9 +1166,8 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 	int xscale = 3;
 	int yscale = 2;
 	int src_x, src_y;
-	float alpha, beta;
-	int Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
-	int E, F, i;
+
+	int i;
 
 	if (gResultImg != NULL) {
 		for (i = 0; i < gImageHeight; i++)
@@ -1193,6 +1192,59 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 				gResultImg[y][3 * x + 0] = inputImage[y * yscale][3 * (x * xscale) + 0];
 				gResultImg[y][3 * x + 1] = inputImage[y * yscale][3 * (x * xscale) + 1];
 				gResultImg[y][3 * x + 2] = inputImage[y * yscale][3 * (x * xscale) + 2];
+			}
+		}
+	}
+}
+
+
+void CimageProc20190831Doc::GeometryZoomoutAvg()
+{
+	// TODO: 여기에 구현 코드 추가.
+	int xscale = 3;
+	int yscale = 2;
+	int sum,rsum,gsum,bsum;
+	int src_x, src_y;
+	int  i,j;
+
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
+	gImageWidth = imageWidth / xscale;
+	gImageHeight = imageHeight / yscale;
+
+	//메모리할당
+	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
+	for (i = 0; i < gImageHeight; i++) {
+		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
+	}
+
+	for (int y = 0; y < imageHeight; y+=yscale) {
+		for (int x = 0; x < imageWidth; x+=xscale) {
+			sum = 0;
+			for (j = 0; j < yscale; j++) 
+				for (i = 0; i < xscale; i++) {
+					src_x = x + i;
+					src_y = y + j;
+					if (src_x > imageWidth - 1) src_x = imageWidth - 1;
+					if (src_y > imageHeight - 1) src_y = imageHeight - 1;
+					if (depth == 1) 
+					    sum += inputImage[src_y][src_x];
+					else {
+						rsum += inputImage[src_y][3*src_x+0];
+						gsum += inputImage[src_y][3 * src_x + 1];
+						bsum += inputImage[src_y][3 * src_x + 2];
+					}
+				}
+			if(depth==1)
+			    gResultImg[y / yscale][x / xscale] = sum / (xscale * yscale);
+			else {
+				gResultImg[y / yscale][3 * (x / xscale) + 0] = rsum / (xscale * yscale);
+				gResultImg[y / yscale][3 * (x / xscale) + 1] = gsum / (xscale * yscale);
+				gResultImg[y / yscale][3 * (x / xscale) + 2] = bsum / (xscale * yscale);
 			}
 		}
 	}

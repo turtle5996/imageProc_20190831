@@ -91,4 +91,5 @@ public:
 	void GeometryZoominPixelCopy();
 	void GeometryZoominInterpolation();
 	void GeometryZoomoutSubsampling();
+	void GeometryZoomoutAvg();
 };
