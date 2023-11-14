@@ -72,6 +72,7 @@ public:
 	afx_msg void OnClosing();
 	afx_msg void OnGeometryZoominPixelCopy();
 	afx_msg void OnGeometryZoominInterpolation();
+	afx_msg void OnGeometryZoomoutSubsampling();
 };
 
 #ifndef _DEBUG  // imageProc_20190831View.cpp의 디버그 버전

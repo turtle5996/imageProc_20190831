@@ -1157,3 +1157,43 @@ void CimageProc20190831Doc::GeometryZoominInterpolation()
 			}
 		}
 }
+
+
+void CimageProc20190831Doc::GeometryZoomoutSubsampling()
+{
+	// TODO: 여기에 구현 코드 추가.
+
+	int xscale = 3;
+	int yscale = 2;
+	int src_x, src_y;
+	float alpha, beta;
+	int Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
+	int E, F, i;
+
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
+	gImageWidth = imageWidth / xscale;
+	gImageHeight = imageHeight / yscale;
+
+	//메모리할당
+	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
+	for (i = 0; i < gImageHeight; i++) {
+		gResultImg[i] = (unsigned char*)malloc(gImageWidth * depth);
+	}
+
+	for (int y = 0; y < gImageHeight; y++) {
+		for (int x = 0; x < gImageWidth; x++) {
+			if (depth == 1)
+				gResultImg[y][x] = inputImage[y * yscale][x * xscale];
+			else {
+				gResultImg[y][3 * x + 0] = inputImage[y * yscale][3 * (x * xscale) + 0];
+				gResultImg[y][3 * x + 1] = inputImage[y * yscale][3 * (x * xscale) + 1];
+				gResultImg[y][3 * x + 2] = inputImage[y * yscale][3 * (x * xscale) + 2];
+			}
+		}
+	}
+}

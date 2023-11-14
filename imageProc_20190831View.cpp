@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 	ON_COMMAND(ID_CLOSING, &CimageProc20190831View::OnClosing)
 	ON_COMMAND(ID_GEOMETRY_ZOOMIN_PIXEL_COPY, &CimageProc20190831View::OnGeometryZoominPixelCopy)
 	ON_COMMAND(ID_GEOMETRY_ZOOMIN_INTERPOLATION, &CimageProc20190831View::OnGeometryZoominInterpolation)
+	ON_COMMAND(ID_GEOMETRY_ZOOMOUT_SSUBSAMPLING, &CimageProc20190831View::OnGeometryZoomoutSubsampling)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -467,5 +468,16 @@ void CimageProc20190831View::OnGeometryZoominInterpolation()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryZoominInterpolation();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryZoomoutSubsampling()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryZoomoutSubsampling();
 	Invalidate(false);
 }
