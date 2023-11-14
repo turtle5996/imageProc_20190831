@@ -1213,9 +1213,6 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 		free(gResultImg);
 	}
 
-	gImageWidth = imageWidth / xscale;
-	gImageHeight = imageHeight / yscale;
-
 	//메모리할당
 	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
 	for (i = 0; i < gImageHeight; i++) {
