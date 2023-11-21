@@ -1321,3 +1321,39 @@ void CimageProc20190831Doc::GeometryRotate()
 		}
 
 }
+
+
+void CimageProc20190831Doc::GeometryMirror()
+{
+	// TODO: 여기에 구현 코드 추가.
+	for (int y = 0; y < imageHeight; y++) {
+		for (int x = 0; x < imageWidth; x++) {
+			if (depth == 1) {
+				resultImage[y][x] = inputImage[y][imageWidth - 1 - x];
+			}
+			else {
+				resultImage[y][3*x+0] = inputImage[y][3*(imageWidth - 1 - x)+0];
+				resultImage[y][3*x+1] = inputImage[y][3 * (imageWidth - 1 - x) + 1];
+				resultImage[y][3*x+2] = inputImage[y][3 * (imageWidth - 1 - x) + 2];
+			}
+		}
+	}
+}
+
+
+void CimageProc20190831Doc::GeometryFlip()
+{
+	// TODO: 여기에 구현 코드 추가.
+	for (int y = 0; y < imageHeight; y++) {
+		for (int x = 0; x < imageWidth; x++) {
+			if (depth == 1) {
+				resultImage[imageHeight -1 -y][x] = inputImage[y][x];
+			}
+			else {
+				resultImage[imageHeight - 1 - y][3 * x + 0] = inputImage[y][3 * x + 0];
+				resultImage[imageHeight - 1 - y][3 * x + 1] = inputImage[y][3 * x + 1];
+				resultImage[imageHeight - 1 - y][3 * x + 2] = inputImage[y][3 * x + 2];
+			}
+		}
+	}
+}

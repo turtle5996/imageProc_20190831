@@ -93,4 +93,6 @@ public:
 	void GeometryZoomoutSubsampling();
 	void GeometryZoomoutAvg();
 	void GeometryRotate();
+	void GeometryMirror();
+	void GeometryFlip();
 };

@@ -59,6 +59,8 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 	ON_COMMAND(ID_GEOMETRY_ZOOMOUT_AVG, &CimageProc20190831View::OnGeometryZoomoutAvg)
 	ON_COMMAND(ID_GEOMETRY_ZOOMOUT_MEANSUB, &CimageProc20190831View::OnIGeometryZoomoutMeanSub)
 	ON_COMMAND(ID_GEOMETRY_ROTATE, &CimageProc20190831View::OnGeometryRotate)
+	ON_COMMAND(ID_GEOMETRY_MIRROR, &CimageProc20190831View::OnGeometryMirror)
+	ON_COMMAND(ID_GEOMETRY_FLIP, &CimageProc20190831View::OnGeometryFilp)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -521,5 +523,33 @@ void CimageProc20190831View::OnGeometryRotate()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryRotate();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryMirror()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+
+
+	ASSERT_VALID(pDoc);
+
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryMirror();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryFilp()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+
+
+	ASSERT_VALID(pDoc);
+
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryFlip();
 	Invalidate(false);
 }
