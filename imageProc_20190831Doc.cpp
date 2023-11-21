@@ -1357,3 +1357,105 @@ void CimageProc20190831Doc::GeometryFlip()
 		}
 	}
 }
+
+typedef struct 
+{
+	int Px;
+	int Py;
+	int Qx;
+	int Qy;
+
+}control_line;
+
+void CimageProc20190831Doc::GeometryWarping()
+{
+	// TODO: 여기에 구현 코드 추가.
+	control_line source_line[5] = {{100,100,150,150}, {0,0,imageWidth-1,0}, {imageWidth-1,0,imageWidth-1,imageHeight-1}, 
+		{imageWidth - 1,imageHeight - 1,0 , imageHeight - 1}, {0 , imageHeight - 1,0,0} };
+	control_line dest_line[5] = { {100,100,200,200}, {0,0,imageWidth - 1,0}, {imageWidth - 1,0,imageWidth - 1,imageHeight - 1},
+		{imageWidth - 1,imageHeight - 1,0 , imageHeight - 1}, {0 , imageHeight - 1,0,0} };
+
+	int x, y;
+	double u;
+	double h;
+	double d;
+	double tx, ty;
+	double xp, yp;
+	double weight;
+	double totalWeight;
+	double a =0.001;
+	double b = 2.0;
+	double p = 0.75;
+
+	int x1, x2, y1, y2;
+	int src_x1, src_x2, src_y1, src_y2;
+
+	double src_line_length, dest_line_length;
+
+	int num_lines = 5;
+	int line;
+	int source_x, source_y;
+	int last_row, last_col;
+	last_row = imageHeight - 1;
+	last_col = imageWidth - 1;
+
+	for (y = 0; y < imageHeight; y++) 
+		for (x = 0; x < imageWidth; x++) {
+			tx = 0.0;
+			ty = 0.0;
+			totalWeight = 0.0;
+			//각 제어선 벼로 영향을 계산
+			for (line = 0; line < num_lines; line++) {
+				x1 = dest_line[line].Px;
+				y1 = dest_line[line].Py;
+				x2 = dest_line[line].Qx;
+				y2 = dest_line[line].Qy;
+
+				dest_line_length = sqrt((double)(x2 - x1)* (x2 - x1) + (y2 - y1)* (y2 - y1));
+
+				u = (double)((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / (double)((x2 - x1)* (x2 - x1) + (y2 - y1)* (y2 - y1));
+				h = (double)((y - y1)*(x2 - x1) - (x - x1)*(y2 - y1)) / dest_line_length;
+
+				if (u < 0) d = sqrt((double)(x - x1)* (x - x1) + (y - y1)* (y - y1));
+				else if (u > 1) d = sqrt((double)(x - x2)* (x - x2) + (y - y2)* (y - y2));
+				else d = fabs(h);
+
+				src_x1 = source_line[line].Px;
+				src_x2 = source_line[line].Qx;
+				src_y1 = source_line[line].Py;
+				src_y2 = source_line[line].Qy;
+
+				src_line_length = sqrt((double)(src_x2 - src_x1)* (src_x2 - src_x1) + (src_y2 - src_y1)* (src_y2 - src_y1));
+
+				//입력영상에서의 대응 픽셀 위치 계산
+				xp = src_x1 + u * (src_x2 - src_x1) - h * (src_y2 - src_y1) / src_line_length;
+				yp = src_y1 + u * (src_y2 - src_y1) + h * (src_x2 - src_x1) / src_line_length;
+
+				//제어선에 대한 가중치 계산
+				weight = pow((pow((double)(dest_line_length), p) / (a + d)), b);
+
+				tx += (xp - x) * weight;
+				ty += (yp - y) * weight;
+				totalWeight += weight;
+
+			}
+			source_x = x + (int)(tx / totalWeight + 0.5);
+			source_y = y + (int)(ty / totalWeight + 0.5);
+
+			if (source_x < 0)source_x = 0;
+			if (source_x > last_col)source_x = last_col;
+			if (source_y < 0)source_y = 0;
+			if (source_y>last_row)source_y = last_row;
+
+			if (depth == 1)  resultImage[y][x] = inputImage[source_y][source_x]; 
+			else {
+				resultImage[y][3 * x + 0] = inputImage[source_y][3 * source_x + 0];
+				resultImage[y][3 * x + 1] = inputImage[source_y][3 * source_x + 1];
+				resultImage[y][3 * x + 2] = inputImage[source_y][3 * source_x + 2];
+			}
+			
+		
+		}
+
+
+}

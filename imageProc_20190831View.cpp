@@ -61,6 +61,7 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 	ON_COMMAND(ID_GEOMETRY_ROTATE, &CimageProc20190831View::OnGeometryRotate)
 	ON_COMMAND(ID_GEOMETRY_MIRROR, &CimageProc20190831View::OnGeometryMirror)
 	ON_COMMAND(ID_GEOMETRY_FLIP, &CimageProc20190831View::OnGeometryFilp)
+	ON_COMMAND(ID_GEOMETRY_WARPING, &CimageProc20190831View::OnGeometryWarping)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -545,11 +546,21 @@ void CimageProc20190831View::OnGeometryFilp()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	CimageProc20190831Doc* pDoc = GetDocument();
-
-
 	ASSERT_VALID(pDoc);
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryFlip();
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::OnGeometryWarping()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryWarping();
 	Invalidate(false);
 }

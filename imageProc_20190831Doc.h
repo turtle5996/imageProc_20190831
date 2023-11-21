@@ -95,4 +95,5 @@ public:
 	void GeometryRotate();
 	void GeometryMirror();
 	void GeometryFlip();
+	void GeometryWarping();
 };
