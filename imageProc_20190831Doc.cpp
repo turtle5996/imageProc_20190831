@@ -18,6 +18,7 @@
 #define new DEBUG_NEW
 #endif
 #include <algorithm>
+#include "CAngleInputDialog.h"
 #define PI 3.14159
 
 // CimageProc20190831Doc
@@ -1257,12 +1258,18 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 
 void CimageProc20190831Doc::GeometryRotate()
 {
+
+	CAngleInputDialog dig;
 	// TODO: 여기에 구현 코드 추가.
 	int x, y, i, j, xdiff, ydiff;
 	int angle = 120; //degree
 	float radian;
 	int Cx, Cy, Oy;
 	int x_source, y_source;
+
+	dig.m_iAngle = angle;
+	if (dig.DoModal() == IDCANCEL) return;
+	angle = dig.m_iAngle;
 
 
 	if (gResultImg != NULL) {
@@ -1291,8 +1298,8 @@ void CimageProc20190831Doc::GeometryRotate()
 
 	for (y = -ydiff; y < gImageHeight - ydiff; y++)
 		for (x = -xdiff; x < gImageWidth - xdiff; x++) {
-			x_source = (Oy - y - Cy) * sin(angle) +( x - Cx) * cos(angle) + Cx;
-			y_source = (Oy - y - Cy) * cos(angle) - (x - Cx) * sin(angle) + Cy;
+			x_source = (Oy - y - Cy) * sin(radian) +( x - Cx) * cos(radian) + Cx;
+			y_source = (Oy - y - Cy) * cos(radian) - (x - Cx) * sin(radian) + Cy;
 
 			y_source = Oy - y_source;
 			if (depth == 1) {

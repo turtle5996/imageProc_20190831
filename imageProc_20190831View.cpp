@@ -12,6 +12,7 @@
 
 #include "imageProc_20190831Doc.h"
 #include "imageProc_20190831View.h"
+#include "CAngleInputDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -514,6 +515,8 @@ void CimageProc20190831View::OnGeometryRotate()
 {
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	CimageProc20190831Doc* pDoc = GetDocument();
+	
+
 	ASSERT_VALID(pDoc);
 
 	if (pDoc->inputImage == NULL)return;
