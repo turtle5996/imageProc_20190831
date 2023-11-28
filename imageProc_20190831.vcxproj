@@ -97,6 +97,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>20971520</StackReserveSize>
+      <AdditionalDependencies>vfw32.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

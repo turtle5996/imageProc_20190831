@@ -1367,13 +1367,31 @@ typedef struct
 
 }control_line;
 
+control_line mctrl_source = { 100,100,150,150 };
+control_line mctrl_dest = { 100,100,200,200 };
+
+
 void CimageProc20190831Doc::GeometryWarping()
 {
 	// TODO: 여기에 구현 코드 추가.
+
+	mctrl_source.Px = clickStartPx;
+	mctrl_source.Py = clickStartPy;
+	mctrl_source.Qx = clickStartQx;
+	mctrl_source.Qy = clickStartQy;
+
+	mctrl_dest.Px = clickEndPx;
+	mctrl_dest.Py = clickEndPy;
+	mctrl_dest.Qx = clickEndQx;
+	mctrl_dest.Qy = clickEndQy;
+
 	control_line source_line[5] = {{100,100,150,150}, {0,0,imageWidth-1,0}, {imageWidth-1,0,imageWidth-1,imageHeight-1}, 
 		{imageWidth - 1,imageHeight - 1,0 , imageHeight - 1}, {0 , imageHeight - 1,0,0} };
 	control_line dest_line[5] = { {100,100,200,200}, {0,0,imageWidth - 1,0}, {imageWidth - 1,0,imageWidth - 1,imageHeight - 1},
 		{imageWidth - 1,imageHeight - 1,0 , imageHeight - 1}, {0 , imageHeight - 1,0,0} };
+
+	source_line[0] = mctrl_source;
+	dest_line[0] = mctrl_dest;
 
 	int x, y;
 	double u;
@@ -1457,5 +1475,5 @@ void CimageProc20190831Doc::GeometryWarping()
 		
 		}
 
-
+       
 }

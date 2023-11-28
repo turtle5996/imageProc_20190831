@@ -14,6 +14,8 @@
 #include "imageProc_20190831View.h"
 #include "CAngleInputDialog.h"
 
+#include <vfw.h>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -62,6 +64,10 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 	ON_COMMAND(ID_GEOMETRY_MIRROR, &CimageProc20190831View::OnGeometryMirror)
 	ON_COMMAND(ID_GEOMETRY_FLIP, &CimageProc20190831View::OnGeometryFilp)
 	ON_COMMAND(ID_GEOMETRY_WARPING, &CimageProc20190831View::OnGeometryWarping)
+//	ON_WM_RBUTTONUP()
+ON_WM_LBUTTONDOWN()
+ON_WM_LBUTTONUP()
+ON_COMMAND(ID_AVI_VIEW, &CimageProc20190831View::OnAviView)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -69,6 +75,7 @@ END_MESSAGE_MAP()
 CimageProc20190831View::CimageProc20190831View() noexcept
 {
 	// TODO: 여기에 생성 코드를 추가합니다.
+	bAviMode = false;
 
 }
 
@@ -90,6 +97,15 @@ void CimageProc20190831View::OnDraw(CDC* pDC)
 {
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
+	if (!pDoc) return;
+
+	if (bAviMode) {
+	  //avi파일 재생
+
+		loadAviFile(pDC);
+		bAviMode = false;
+		return;
+	}
 
 	if (pDoc->inputImage != NULL) {
 		if (pDoc->depth == 1) {
@@ -563,4 +579,119 @@ void CimageProc20190831View::OnGeometryWarping()
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryWarping();
 	Invalidate(false);
+}
+
+
+CPoint mPos_start, mPos_end;
+
+void CimageProc20190831View::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+    mPos_start = point;
+	CScrollView::OnLButtonDown(nFlags, point);
+	
+}
+
+
+void CimageProc20190831View::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	mPos_end = point;
+
+	CDC* pDc = GetDC();
+	CPen rpen;
+	rpen.CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+	pDc->SelectObject(rpen);
+
+	pDc->MoveTo(mPos_start);
+	pDc->LineTo(mPos_end);
+
+	ReleaseDC(pDc);
+
+	int Ax, Ay, Bx, By;
+	Ax = mPos_start.x;
+	Ay = mPos_start.y;
+	Bx = mPos_end.x;
+	By = mPos_end.y;
+
+	if (Ax < Bx) pDoc->clickStartPx = Ax - (Bx - Ax)/2;
+	else pDoc->clickStartPx = Ax + (Ax - Bx) / 2;
+	if (Ay < By) pDoc->clickStartPy = Ay - (By - Ay) / 2;
+	else pDoc->clickStartPy = Ay + (Ay - By) / 2;
+	
+	pDoc->clickEndPx = pDoc->clickStartPx;
+	pDoc->clickEndPy = pDoc->clickStartPy;
+
+	pDoc->clickStartQx = mPos_start.x;
+	pDoc->clickStartQy = mPos_start.y;
+	pDoc->clickEndQx = mPos_end.x;
+	pDoc->clickEndQy = mPos_end.y;
+
+
+   	
+
+	CScrollView::OnLButtonUp(nFlags, point);
+}
+
+
+void CimageProc20190831View::OnAviView()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CFile file;
+	CFileDialog dlg(true,"","",OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,"AVI파일(*.aiv)|*.avi|모든 파일|*.*|");
+
+	if (dlg.DoModal() == IDOK) {
+		AviFileName = dlg.GetPathName();
+		bAviMode = true;
+		
+	}
+	Invalidate(false);
+}
+
+
+void CimageProc20190831View::loadAviFile(CDC* pDC)
+{
+	// TODO: 여기에 구현 코드 추가.
+	PAVIFILE pavi;
+	AVIFILEINFO fi;
+	int stm;
+	PAVISTREAM pstm = NULL;
+	AVISTREAMINFO si;
+	PGETFRAME pfrm = NULL;
+	int frame;
+	LPBITMAPINFOHEADER pbmih;
+	unsigned char* image;
+	int x, y;
+
+	AVIFileInit();
+	AVIFileOpen(&pavi,AviFileName,OF_READ|OF_SHARE_DENY_NONE,NULL);
+
+	AVIFileInfo(pavi, &fi, sizeof(AVIFILEINFO));
+
+	for (stm = 0; stm < fi.dwStreams; stm++) {
+		AVIFileGetStream(pavi, &pstm, 0, stm);
+		AVIStreamInfo(pstm, &si, sizeof(si));
+		if (si.fccType == streamtypeVIDEO) {
+			pfrm = AVIStreamGetFrameOpen(pstm, NULL);
+
+			for (frame = 0; frame < 30; frame++) { // si.dwLength
+				pbmih = (LPBITMAPINFOHEADER)AVIStreamGetFrame(pfrm, frame);
+				if (!pbmih) continue;
+				image = (unsigned char*)((LPSTR)pbmih + (WORD)pbmih->biSize);
+				for (int y = 0; y < fi.dwHeight; y++) 
+					for (int x = 0; x < fi.dwWidth; x++) {
+						pDC->SetPixel(x,fi.dwHeight-1-y,RGB(image[(y*fi.dwWidth+x)*3+2],
+							image[(y * fi.dwWidth + x) * 3 + 1], image[(y * fi.dwWidth + x) * 3 + 0]));
+					}
+			}
+		}
+	}
+	AVIStreamGetFrameClose(pfrm);
+	AVIStreamRelease(pstm);
+	AVIFileRelease(pavi);
+	AVIFileExit();
 }

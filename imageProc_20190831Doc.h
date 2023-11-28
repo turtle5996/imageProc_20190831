@@ -59,6 +59,9 @@ public:
 	int gImageHeight;
 	unsigned char** gResultImg;
 
+	int clickStartPx, clickStartPy, clickStartQx, clickStartQy;
+	int clickEndPx, clickEndPy, clickEndQx, clickEndQy;
+
 	void pixelAdd();
 	void pixelSub();
 	void pixelMul();
