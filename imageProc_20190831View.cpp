@@ -677,16 +677,22 @@ void CimageProc20190831View::loadAviFile(CDC* pDC)
 		AVIStreamInfo(pstm, &si, sizeof(si));
 		if (si.fccType == streamtypeVIDEO) {
 			pfrm = AVIStreamGetFrameOpen(pstm, NULL);
-
-			for (frame = 0; frame < 30; frame++) { // si.dwLength
+			
+			for (frame = 0; frame < si.dwLength; frame++) { 
 				pbmih = (LPBITMAPINFOHEADER)AVIStreamGetFrame(pfrm, frame);
 				if (!pbmih) continue;
 				image = (unsigned char*)((LPSTR)pbmih + (WORD)pbmih->biSize);
+				/*
 				for (int y = 0; y < fi.dwHeight; y++) 
 					for (int x = 0; x < fi.dwWidth; x++) {
 						pDC->SetPixel(x,fi.dwHeight-1-y,RGB(image[(y*fi.dwWidth+x)*3+2],
 							image[(y * fi.dwWidth + x) * 3 + 1], image[(y * fi.dwWidth + x) * 3 + 0]));
 					}
+				*/
+
+				::SetDIBitsToDevice(pDC->GetSafeHdc(), 0, 0, fi.dwWidth, fi.dwHeight, 0, 0, 0, fi.dwWidth,
+					image, (BITMAPINFO*)pbmih, DIB_RGB_COLORS);
+				Sleep(30);
 			}
 		}
 	}
