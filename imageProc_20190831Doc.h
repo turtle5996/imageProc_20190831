@@ -58,6 +58,7 @@ public:
 	int gImageWidth;
 	int gImageHeight;
 	unsigned char** gResultImg;
+	unsigned char** morphedImg[10];
 
 	int clickStartPx, clickStartPy, clickStartQx, clickStartQy;
 	int clickEndPx, clickEndPy, clickEndQx, clickEndQy;
@@ -99,4 +100,5 @@ public:
 	void GeometryMirror();
 	void GeometryFlip();
 	void GeometryWarping();
+	void GeometryMorphing();
 };

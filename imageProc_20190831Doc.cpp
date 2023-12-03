@@ -20,6 +20,7 @@
 #include <algorithm>
 #include "CAngleInputDialog.h"
 #define PI 3.14159
+#define NUM_FRAMES 10
 
 // CimageProc20190831Doc
 
@@ -1039,11 +1040,7 @@ void CimageProc20190831Doc::GeometryZoominPixelCopy()
 	int yscale = 3;
 	int i;
 
-	if (gResultImg != NULL) {
-		for (i = 0; i < gImageHeight; i++)
-			free(gResultImg[i]);
-		free(gResultImg);
-	}
+
 
 	gImageWidth = imageWidth * xscale;
 	gImageHeight = imageHeight * yscale;
@@ -1084,7 +1081,11 @@ void CimageProc20190831Doc::GeometryZoominPixelCopy()
 				gResultImg[y][3 * x + 2] = inputImage[y / yscale][3*(x / xscale)+2];
 			}
 		}
-		
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
 
 }
 
@@ -1101,11 +1102,7 @@ void CimageProc20190831Doc::GeometryZoominInterpolation()
 	int Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
 	int E, F;
 
-	if (gResultImg != NULL) {
-		for (i = 0; i < gImageHeight; i++)
-			free(gResultImg[i]);
-		free(gResultImg);
-	}
+	
 
 	gImageWidth = imageWidth * xscale;
 	gImageHeight = imageHeight * yscale;
@@ -1158,6 +1155,11 @@ void CimageProc20190831Doc::GeometryZoominInterpolation()
 				gResultImg[y][3 * x + 2] = (unsigned char)(E * (1 - beta) + F * beta);
 			}
 		}
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
 }
 
 
@@ -1171,11 +1173,7 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 
 	int i,y,x;
 
-	if (gResultImg != NULL) {
-		for (i = 0; i < gImageHeight; i++)
-			free(gResultImg[i]);
-		free(gResultImg);
-	}
+
 
 	gImageWidth = imageWidth / xscale;
 	gImageHeight = imageHeight / yscale;
@@ -1197,6 +1195,11 @@ void CimageProc20190831Doc::GeometryZoomoutSubsampling()
 			}
 		}
 	}
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
 }
 
 
@@ -1212,11 +1215,6 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 	gImageWidth = imageWidth / xscale + 1;
 	gImageHeight = imageHeight / yscale + 1;
 
-	if (gResultImg != NULL) {
-		for (i = 0; i < gImageHeight; i++)
-			free(gResultImg[i]);
-		free(gResultImg);
-	}
 
 	//메모리할당
 	gResultImg = (unsigned char**)malloc(gImageHeight * sizeof(unsigned char*));
@@ -1253,6 +1251,12 @@ void CimageProc20190831Doc::GeometryZoomoutAvg()
 			}
 		}
 	}
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+	}
+
 }
 
 
@@ -1272,12 +1276,7 @@ void CimageProc20190831Doc::GeometryRotate()
 	angle = dig.m_iAngle;
 
 
-	if (gResultImg != NULL) {
-		for (i = 0; i < gImageHeight; i++)
-			free(gResultImg[i]);
-		free(gResultImg);
-	}
-
+	
 	radian = 2 * PI / 360 * angle;
 	gImageWidth = (imageHeight * fabs(cos(PI / 2 - radian)) + imageWidth * fabs(cos(radian)));
 	gImageHeight = (imageHeight * fabs(cos(radian)) + imageWidth * fabs(cos(PI / 2 - radian)));
@@ -1323,7 +1322,7 @@ void CimageProc20190831Doc::GeometryRotate()
 		for (i = 0; i < gImageHeight; i++)
 			free(gResultImg[i]);
 		free(gResultImg);
-		}
+	}
 
 }
 
@@ -1482,3 +1481,84 @@ void CimageProc20190831Doc::GeometryWarping()
 
        
 }
+
+
+void CimageProc20190831Doc::GeometryMorphing()
+{
+	// TODO: 여기에 구현 코드 추가.
+	control_line source_line[23] =
+	{ {116,7,207,5},{34,109,90,21},{55,249,30,128},{118,320,65,261},
+	 {123,321,171,321},{179,319,240,264},{247,251,282,135},{281,114,228,8},
+	 {78,106,123,109},{187,115,235,114},{72,142,99,128},{74,150,122,154},
+	 {108,127,123,146},{182,152,213,132},{183,159,229,157},{219,131,240,154},
+	 {80,246,117,212},{127,222,146,223},{154,227,174,221},{228,252,183,213},
+	 {114,255,186,257},{109,258,143,277},{152,278,190,262} };
+	control_line dest_line[23] =
+	{ {120,8,200,6},{12,93,96,16},{74,271,16,110},{126,336,96,290},
+	 {142,337,181,335},{192,335,232,280},{244,259,288,108},{285,92,212,13},
+	 {96,135,136,118},{194,119,223,125},{105,145,124,134},{110,146,138,151},
+	 {131,133,139,146},{188,146,198,134},{189,153,218,146},{204,133,221,140},
+	 {91,268,122,202},{149,206,159,209},{170,209,181,204},{235,265,208,199},
+	 {121,280,205,284},{112,286,160,301},{166,301,214,287} };
+
+	double u;
+	double h;
+	double d;
+	double tx, ty;
+	double xp, yp;
+	double weight;
+	double totalWeight;
+	double a = 0.001, b = 2.0, p = 0.75;
+	unsigned char** warpedImg;
+	unsigned char** warpedImg2;
+	int frame;
+	double fweight;
+	control_line warp_lines[23];
+	double tx2, ty2, xp2, yp2;
+	int dest_x1, dest_y1, dest_x2, dest_y2, source_x2, source_y2;
+	int x1, y1, x2, y2, src_x1, src_x2, src_y1, src_y2;
+	double src_line_length, dest_line_length;
+	int i, j;
+	int num_lines = 23;
+	int line, x, y, source_x, source_y, last_row, last_col;
+
+	//두 입력 영상을 읽어 들임
+	LoadTwoImages();
+
+
+	// 중간 프레임의 위핑 결과를 저장
+
+	if (warpedImg != NULL) {
+		for (i = 0; i < imageHeight; i++)
+			free(warpedImg[i]);
+		free(warpedImg);
+	}
+	warpedImg = (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
+	for (i = 0; i < imageHeight; i++) warpedImg[i] = (unsigned char*)malloc(imageWidth * depth);
+
+	if (warpedImg2 != NULL) {
+		for (i = 0; i < imageHeight; i++)
+			free(warpedImg2[i]);
+		free(warpedImg2);
+	}
+	warpedImg2 = (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
+	for (i = 0; i < imageHeight; i++) warpedImg2[i] = (unsigned char*)malloc(imageWidth * depth);
+
+	for (i = 0; i < NUM_FRAMES; i++) {
+		if (morphedImg[i] != NULL) {
+			for (j = 0; j < imageHeight; j++)
+				free(morphedImg[i][j]);
+			free(morphedImg[i]);
+		}
+	}
+	for (i = 0; i < NUM_FRAMES; i++) {
+		morphedImg[i]= (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
+		for (j = 0; j < imageHeight; j++) morphedImg[i][j] = (unsigned char*)malloc(imageWidth * depth);
+	}
+
+	last_col = imageWidth - 1;
+	last_row = imageHeight - 1;
+
+
+}
+

@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CimageProc20190831View, CScrollView)
 ON_WM_LBUTTONDOWN()
 ON_WM_LBUTTONUP()
 ON_COMMAND(ID_AVI_VIEW, &CimageProc20190831View::OnAviView)
+ON_COMMAND(ID_GEOMETRY_MORPHING, &CimageProc20190831View::OnGeometryMorphing)
 END_MESSAGE_MAP()
 
 // CimageProc20190831View 생성/소멸
@@ -700,4 +701,16 @@ void CimageProc20190831View::loadAviFile(CDC* pDC)
 	AVIStreamRelease(pstm);
 	AVIFileRelease(pavi);
 	AVIFileExit();
+}
+
+
+void CimageProc20190831View::OnGeometryMorphing()
+{
+	// TODO: 여기에 명령 처리기 코드를 추가합니다.
+	CimageProc20190831Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	if (pDoc->inputImage == NULL)return;
+	pDoc->GeometryMorphing();
+	Invalidate(false);
 }
