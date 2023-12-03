@@ -1319,6 +1319,11 @@ void CimageProc20190831Doc::GeometryRotate()
 				}
 			}
 		}
+	if (gResultImg != NULL) {
+		for (i = 0; i < gImageHeight; i++)
+			free(gResultImg[i]);
+		free(gResultImg);
+		}
 
 }
 
