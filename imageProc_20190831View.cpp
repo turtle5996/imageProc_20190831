@@ -1,5 +1,4 @@
-﻿
-// imageProc_20190831View.cpp: CimageProc20190831View 클래스의 구현
+﻿// imageProc_20190831View.cpp: CimageProc20190831View 클래스의 구현
 //
 
 #include "pch.h"
@@ -18,6 +17,7 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#define NUM_FRAMES 10
 #endif
 
 
@@ -172,6 +172,17 @@ void CimageProc20190831View::OnDraw(CDC* pDC)
 			}
 		}
 	}
+	for (int i = 0; i < 10; i++){
+		if (pDoc->morphedImg[i] != NULL) {
+
+			for (int y = 0; y < pDoc->imageHeight; y++)       // 모핑 결과 출력 
+				for (int x = 0; x < pDoc->imageWidth; x++)
+					pDC->SetPixel(x + 100 + pDoc->imageWidth, y,
+						RGB(pDoc->morphedImg[i][y][x],
+							pDoc->morphedImg[i][y][x],
+							pDoc->morphedImg[i][y][x]));
+		}
+	}
 	
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 }
@@ -240,7 +251,7 @@ void CimageProc20190831View::OnPixelAdd()
 	if (pDoc->inputImage == NULL) return;
 	pDoc->pixelAdd();
 	
-	Invalidate(false);
+	Invalidate();
 }
 
 //빼기
@@ -252,7 +263,7 @@ void CimageProc20190831View::OnPixelSub()
 	if (pDoc->inputImage == NULL) return;
 	pDoc->pixelSub();
 
-	Invalidate(false);
+	Invalidate();
 }
 
 //곱하기
@@ -264,7 +275,7 @@ void CimageProc20190831View::OnPixelMul()
 	if (pDoc->inputImage == NULL) return;
 	pDoc->pixelMul();
 
-	Invalidate(false);
+	Invalidate();
 }
 
 // 나누기
@@ -275,7 +286,7 @@ void CimageProc20190831View::OnPixelDiv()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL) return;
 	pDoc->pixelDiv();
-	Invalidate(false);
+	Invalidate();
 }
 
 //히스토그램 평활화
@@ -285,7 +296,7 @@ void CimageProc20190831View::OnPixelHistoEq()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->pixelHistoEq();
-	Invalidate(false);
+	Invalidate();
 
 }
 
@@ -296,7 +307,7 @@ void CimageProc20190831View::OnPixelStretch()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->pixelStretch();
-	Invalidate(false);
+	Invalidate();
 }
 
 //이진화
@@ -306,7 +317,7 @@ void CimageProc20190831View::OnPixelBinaryzation()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->pixelBinaryzation();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -316,7 +327,7 @@ void CimageProc20190831View::OnPixelTwoImageAdd()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->pixelTwoImageAdd();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -326,7 +337,7 @@ void CimageProc20190831View::OnPixelTwoImageSub()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->pixelTwoImageSub();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -336,7 +347,7 @@ void CimageProc20190831View::OnRegionSharpening()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionSharpening();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -346,7 +357,7 @@ void CimageProc20190831View::OnRegionSmoothing()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionSmoothing();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -356,7 +367,7 @@ void CimageProc20190831View::OnRegionEmbossing()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionEmbossing();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -366,7 +377,7 @@ void CimageProc20190831View::OnRegionSobel()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionSobel();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -376,7 +387,7 @@ void CimageProc20190831View::OnRegionPrewitt()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionPrewitt();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -387,7 +398,7 @@ void CimageProc20190831View::OnRegionRoberts()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionRoberts();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -397,7 +408,7 @@ void CimageProc20190831View::OnRegionAverageFilter()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionAverageFilter();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -407,7 +418,7 @@ void CimageProc20190831View::OnRegionMedian()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->RegionMedian();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -417,7 +428,7 @@ void CimageProc20190831View::OnMopologyColorGray()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->MopologyColorGray();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -427,7 +438,7 @@ void CimageProc20190831View::OnMopologyBinary()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	pDoc->MopologyBinary();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -438,7 +449,7 @@ void CimageProc20190831View::OnErosion()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->Erosion();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -449,7 +460,7 @@ void CimageProc20190831View::OnDilation()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->Dilation();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -460,7 +471,7 @@ void CimageProc20190831View::OnOpening()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->Opening();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -471,7 +482,7 @@ void CimageProc20190831View::OnClosing()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->Closing();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -482,7 +493,7 @@ void CimageProc20190831View::OnGeometryZoominPixelCopy()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryZoominPixelCopy();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -504,7 +515,7 @@ void CimageProc20190831View::OnGeometryZoomoutSubsampling()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryZoomoutSubsampling();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -516,7 +527,7 @@ void CimageProc20190831View::OnGeometryZoomoutAvg()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryZoomoutAvg();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -525,10 +536,10 @@ void CimageProc20190831View::OnIGeometryZoomoutMeanSub()
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
-	OnRegionSmoothing();
+	pDoc->RegionSmoothing();
 	pDoc->CopyResultToInput();
-	OnGeometryZoomoutSubsampling();
-	Invalidate(false);
+	pDoc->GeometryZoomoutSubsampling();
+	Invalidate();
 }
 
 
@@ -542,7 +553,7 @@ void CimageProc20190831View::OnGeometryRotate()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryRotate();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -556,7 +567,7 @@ void CimageProc20190831View::OnGeometryMirror()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryMirror();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -568,7 +579,7 @@ void CimageProc20190831View::OnGeometryFilp()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryFlip();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -580,7 +591,7 @@ void CimageProc20190831View::OnGeometryWarping()
 
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryWarping();
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -651,7 +662,7 @@ void CimageProc20190831View::OnAviView()
 		bAviMode = true;
 		
 	}
-	Invalidate(false);
+	Invalidate();
 }
 
 
@@ -712,5 +723,5 @@ void CimageProc20190831View::OnGeometryMorphing()
 	ASSERT_VALID(pDoc);
 
 	pDoc->GeometryMorphing();
-	Invalidate(false);
+	Invalidate();
 }
