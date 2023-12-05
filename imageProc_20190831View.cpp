@@ -172,6 +172,7 @@ void CimageProc20190831View::OnDraw(CDC* pDC)
 			}
 		}
 	}
+	
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 }
 
@@ -710,7 +711,6 @@ void CimageProc20190831View::OnGeometryMorphing()
 	CimageProc20190831Doc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryMorphing();
 	Invalidate(false);
 }

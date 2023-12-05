@@ -1527,30 +1527,14 @@ void CimageProc20190831Doc::GeometryMorphing()
 
 
 	// 중간 프레임의 위핑 결과를 저장
-
-	if (warpedImg != NULL) {
-		for (i = 0; i < imageHeight; i++)
-			free(warpedImg[i]);
-		free(warpedImg);
-	}
 	warpedImg = (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
 	for (i = 0; i < imageHeight; i++) warpedImg[i] = (unsigned char*)malloc(imageWidth * depth);
 
-	if (warpedImg2 != NULL) {
-		for (i = 0; i < imageHeight; i++)
-			free(warpedImg2[i]);
-		free(warpedImg2);
-	}
+	
 	warpedImg2 = (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
 	for (i = 0; i < imageHeight; i++) warpedImg2[i] = (unsigned char*)malloc(imageWidth * depth);
 
-	for (i = 0; i < NUM_FRAMES; i++) {
-		if (morphedImg[i] != NULL) {
-			for (j = 0; j < imageHeight; j++)
-				free(morphedImg[i][j]);
-			free(morphedImg[i]);
-		}
-	}
+	
 	for (i = 0; i < NUM_FRAMES; i++) {
 		morphedImg[i]= (unsigned char**)malloc(imageHeight * sizeof(unsigned char*));
 		for (j = 0; j < imageHeight; j++) morphedImg[i][j] = (unsigned char*)malloc(imageWidth * depth);
@@ -1559,6 +1543,122 @@ void CimageProc20190831Doc::GeometryMorphing()
 	last_col = imageWidth - 1;
 	last_row = imageHeight - 1;
 
+	for (frame = 1; frame <= NUM_FRAMES; frame++) {
+		fweight = (double)(frame) / NUM_FRAMES;
 
+		for (line = 0; line < num_lines; line++) {
+			warp_lines[line].Px = (int)(source_line[line].Px + (dest_line[line].Px - source_line[line].Px) * fweight);
+			warp_lines[line].Py = (int)(source_line[line].Py + (dest_line[line].Py - source_line[line].Py) * fweight);
+			warp_lines[line].Qx = (int)(source_line[line].Qx + (dest_line[line].Qx - source_line[line].Qx) * fweight);
+			warp_lines[line].Qy = (int)(source_line[line].Qy + (dest_line[line].Qy - source_line[line].Qy) * fweight);
+		}
+		for (y = 0; y < imageHeight; y++) {
+			for (x = 0; x < imageHeight; x++) {
+				totalWeight = 0.0;
+				tx = 0.0;
+				ty = 0.0;
+				tx2 = 0.0;
+				ty2 = 0.0;
+				for (line = 0; line < num_lines; line++)
+				{
+					x1 = warp_lines[line].Px;
+					y1 = warp_lines[line].Py;
+					x2 = warp_lines[line].Qx;
+					y2 = warp_lines[line].Qy;
+					dest_line_length = sqrt((double)(x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+					u = (double)((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) /
+						(double)((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+					h = (double)((y - y1) * (x2 - x1) - (x - x1) * (y2 - y1)) / dest_line_length;
+
+					// 제어선과 픽셀 사이의 거리 계산 
+					if (u < 0) d = sqrt((double)(x - x1) * (x - x1) + (y - y1) * (y - y1));
+					else if (u > 1) d = sqrt((double)(x - x2) * (x - x2) + (y - y2) * (y - y2));
+					else d = fabs(h);
+
+					src_x1 = source_line[line].Px;
+					src_y1 = source_line[line].Py;
+					src_x2 = source_line[line].Qx;
+					src_y2 = source_line[line].Qy;
+					src_line_length = sqrt((double)(src_x2 - src_x1) * (src_x2 - src_x1) +
+						(src_y2 - src_y1) * (src_y2 - src_y1));
+					dest_x1 = dest_line[line].Px;
+					dest_y1 = dest_line[line].Py;
+					dest_x2 = dest_line[line].Qx;
+					dest_y2 = dest_line[line].Qy;
+					dest_line_length = sqrt((double)(dest_x2 - dest_x1) * (dest_x2 - dest_x1) +
+						(dest_y2 - dest_y1) * (dest_y2 - dest_y1));
+
+					// 입력 영상 1에서의 대응 픽셀 위치 계산 
+					xp = src_x1 + u * (src_x2 - src_x1) -
+						h * (src_y2 - src_y1) / src_line_length;
+					yp = src_y1 + u * (src_y2 - src_y1) +
+						h * (src_x2 - src_x1) / src_line_length;
+
+					// 입력 영상 2에서의 대응 픽셀 위치 계산 
+					xp2 = dest_x1 + u * (dest_x2 - dest_x1) -
+						h * (dest_y2 - dest_y1) / dest_line_length;
+					yp2 = dest_y1 + u * (dest_y2 - dest_y1) +
+						h * (dest_x2 - dest_x1) / dest_line_length;
+					weight = pow((pow((double)(dest_line_length), p) / (a + d)), b);
+
+					// 입력 영상 1의 대응 픽셀과의 변위 계산 
+					tx += (xp - x) * weight;
+					ty += (yp - y) * weight;
+
+					// 입력 영상 2의 대응 픽셀과의 변위 계산 
+					tx2 += (xp2 - x) * weight;
+					ty2 += (yp2 - y) * weight;
+
+					totalWeight += weight;
+				}
+				source_x = x + (int)(tx / totalWeight + 0.5);
+				source_y = y + (int)(ty / totalWeight + 0.5);
+
+				// 입력 영상 2의 대응 픽셀 위치 계산 
+				source_x2 = x + (int)(tx2 / totalWeight + 0.5);
+				source_y2 = y + (int)(ty2 / totalWeight + 0.5);
+
+				// 영상의 경계를 벗어나는지 검사 
+				if (source_x < 0) source_x = 0;
+				if (source_x > last_col) source_x = last_col;
+				if (source_y < 0) source_y = 0;
+				if (source_y > last_row) source_y = last_row;
+
+				if (source_x2 < 0) source_x2 = 0;
+				if (source_x2 > last_col) source_x2 = last_col;
+				if (source_y2 < 0) source_y2 = 0;
+				if (source_y2 > last_row) source_y2 = last_row;
+				warpedImg[y][x] = inputImage[source_y][source_x];
+				warpedImg2[y][x] = inputImage2[source_y2][source_x2];
+			}
+		}
+
+		// 모핑 결과 합병 
+		for (y = 0; y < imageHeight; y++)
+			for (x = 0; x < imageWidth; x++) {
+				int val = (int)((1.0 - fweight) * warpedImg[y][x] +
+					fweight * warpedImg2[y][x]);
+				if (val < 0) val = 0;
+				if (val > 255) val = 255;
+				morphedImg[frame - 1][y][x] = val;
+			}
+	}
+	if (warpedImg != NULL) {
+		for (i = 0; i < imageHeight; i++)
+			free(warpedImg[i]);
+		free(warpedImg);
+	}
+	if (warpedImg2 != NULL) {
+		for (i = 0; i < imageHeight; i++)
+			free(warpedImg2[i]);
+		free(warpedImg2);
+	}
+	if (morphedImg != NULL) {
+		for (i = 0; i < NUM_FRAMES; i++) {
+			for (j = 0; j < imageHeight; j++)
+				free(morphedImg[i][j]);
+			free(morphedImg[i]);
+		}
+	}
 }
 
