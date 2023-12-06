@@ -12,7 +12,7 @@ protected: // serialization에서만 만들어집니다.
 	CimageProc20190831Doc() noexcept;
 	DECLARE_DYNCREATE(CimageProc20190831Doc)
 
-// 특성입니다.
+// 특성입니다. 
 public:
 
 // 작업입니다.
