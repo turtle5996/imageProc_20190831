@@ -366,8 +366,7 @@ void CimageProc20190831Doc::pixelTwoImageSub()
 		for (int x = 0; x < imageWidth*depth; x++) {
 			value = inputImage[y][x] - inputImage2[y][x];
 			if (value > 64) value = 255;
-			else if(value<0) value = 0;
-			else value = 0;
+			else if(value<64) value = 0;
 
 			resultImage[y][x] = value;
 		}
