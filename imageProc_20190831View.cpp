@@ -504,7 +504,7 @@ void CimageProc20190831View::OnGeometryZoominInterpolation()
 	ASSERT_VALID(pDoc);
 	if (pDoc->inputImage == NULL)return;
 	pDoc->GeometryZoominInterpolation();
-	Invalidate(false);
+	Invalidate();
 }
 
 
