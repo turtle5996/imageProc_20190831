@@ -829,7 +829,7 @@ void CimageProc20190831Doc::RegionAverageFilter()
 						if (depth == 1)  sum += inputImage[y + i][x + j];
 
 						else {
-							r += inputImage[y + i][3*(x+j)+0];
+							r += inputImage[y + i][3 * (x + j) + 0];
 							g += inputImage[y + i][3 * (x + j) + 1];
 							b += inputImage[y + i][3 * (x + j) + 2];
 						}
@@ -856,18 +856,61 @@ void CimageProc20190831Doc::RegionMedian()
 	int n[9];
 	for (y = 1; y < imageHeight-1; y++){
 		for (x = 1; x < imageWidth-1; x++) {
-			n[0] = inputImage[y-1][x-1];
-			n[1] = inputImage[y-1][x];
-			n[2] = inputImage[y-1][x+1];
-			n[3] = inputImage[y][x-1];
-			n[4] = inputImage[y][x];
-			n[5] = inputImage[y][x+1];
-			n[6] = inputImage[y+1][x-1];
-			n[7] = inputImage[y+1][x];
-			n[8] = inputImage[y+1][x+1];
+			if (depth == 1) {
+				n[0] = inputImage[y - 1][x - 1];
+				n[1] = inputImage[y - 1][x];
+				n[2] = inputImage[y - 1][x + 1];
+				n[3] = inputImage[y][x - 1];
+				n[4] = inputImage[y][x];
+				n[5] = inputImage[y][x + 1];
+				n[6] = inputImage[y + 1][x - 1];
+				n[7] = inputImage[y + 1][x];
+				n[8] = inputImage[y + 1][x + 1];
 
-			std::sort(n, n+9);
-			resultImage[y][x] = n[4];
+				std::sort(n, n + 9);
+				resultImage[y][x] = n[4];
+				
+			}
+			else {
+				n[0] = inputImage[y - 1][3*(x - 1)+0];
+				n[1] = inputImage[y - 1][3 * x  + 0];
+				n[2] = inputImage[y - 1][3 * (x + 1) + 0];
+				n[3] = inputImage[y][3 * (x - 1) + 0];
+				n[4] = inputImage[y][3 * x + 0];
+				n[5] = inputImage[y][3 * (x + 1) + 0];
+				n[6] = inputImage[y + 1][3 * (x - 1) + 0];
+				n[7] = inputImage[y + 1][3 * x + 0];
+				n[8] = inputImage[y + 1][3 * (x + 1) + 0];
+
+				std::sort(n, n + 9);
+				resultImage[y][3*x+0] = n[4];
+
+				n[0] = inputImage[y - 1][3 * (x - 1) + 1];
+				n[1] = inputImage[y - 1][3 * x + 1];
+				n[2] = inputImage[y - 1][3 * (x + 1) + 1];
+				n[3] = inputImage[y][3 * (x - 1) + 1];
+				n[4] = inputImage[y][3 * x + 1];
+				n[5] = inputImage[y][3 * (x + 1) + 1];
+				n[6] = inputImage[y + 1][3 * (x - 1) + 1];
+				n[7] = inputImage[y + 1][3 * x + 1];
+				n[8] = inputImage[y + 1][3 * (x + 1) + 1];
+
+				std::sort(n, n + 9);
+				resultImage[y][3 * x + 1] = n[4];
+
+				n[0] = inputImage[y - 1][3 * (x - 1) + 2];
+				n[1] = inputImage[y - 1][3 * x + 2];
+				n[2] = inputImage[y - 1][3 * (x + 1) + 2];
+				n[3] = inputImage[y][3 * (x - 1) + 2];
+				n[4] = inputImage[y][3 * x + 2];
+				n[5] = inputImage[y][3 * (x + 1) + 2];
+				n[6] = inputImage[y + 1][3 * (x - 1) + 2];
+				n[7] = inputImage[y + 1][3 * x + 2];
+				n[8] = inputImage[y + 1][3 * (x + 1) + 2];
+
+				std::sort(n, n + 9);
+				resultImage[y][3 * x + 2] = n[4];
+			}
 		}
 
 	}
