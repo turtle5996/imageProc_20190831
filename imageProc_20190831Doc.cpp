@@ -204,6 +204,7 @@ void CimageProc20190831Doc::pixelSub()
 		for (int x = 0; x < imageWidth*depth; x++) {
 			value = inputImage[y][x] - 100;
 			if (value > 255) resultImage[y][x] = 255;
+			else if (value < 0)resultImage[y][x] = 0;
 			else resultImage[y][x] = value;
 		}
 	}
